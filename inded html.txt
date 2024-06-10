@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #84c6e7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        header {
+            background-color: #4488ad;
+            color: #0d0c0c;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        header nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        header nav ul li {
+            display: inline;
+            margin: 0 1rem;
+        }
+
+        header nav ul li a {
+            color: #111111;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            background-color: #b1e1e1;
+            align-items: center;
+        }
+
+        footer {
+            background-color: #181918;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+            align-items: center;
+        }
+
+        h1, h2 {
+            color: #060606;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #e0e0e0;
+            margin: 0.5rem 0;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        li:hover {
+            background-color: #d0d0d0;
+            align-items: center;
+        }
+
+        .hidden {
+            
+            display: table;
+        }
+
+        .audio-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .controls {
+            margin-top: 1rem;
+        }
+
+        .controls button {
+            margin: 0 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #121212;
+            border: 1px solid #999;
+            margin: 1rem 0;
+            align-items: center;
+        }
+
+        .progress {
+            width: 0;
+            height: 10px;
+            background-color: #4CAF50;
+
+        }
+
+        .album-cover {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Music Player</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="loadPage('home')">Home</a></li>
+                    <li><a href="#" onclick="loadPage('library')">Library</a></li>
+                    <li><a href="#" onclick="loadPage('playlists')">Playlists</a></li>
+                </ul>
+                
+            </nav>
+        </header>
+        <main id="main-content">
+            <h2>Welcome to the Music Player App</h2>
+            <p>Select a song from the library or create a playlist to get started.</p>
+            <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 Music Player App</p>
+        </footer>
+    </div>
+    
+    <script>
+        const library = [
+            { title: 'song 1', artist: 'Artist 1', src: 'song1.mp3', cover: 'https://i.pinimg.com/736x/c1/f1/55/c1f1551c3e6dbd7f83e42f0dbe499d23.jpg' },
+            { title: 'Song 2', artist: 'Artist 2', src: 'song2.mp3', cover: 'https://a10.gaanacdn.com/gn_img/albums/6Zxb27K9wN/Zxb21AzmW9/size_l.jpg' },
+            { title: 'Song 3', artist: 'Artist 3', src: 'song3.mp3', cover: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTBIlFWNGQFsaHIZlWPpgdXzs2bnpGGDgOlA&s' },
+            { title: 'Song 4', artist: 'Artist 2', src: 'song2.mp3', cover: 'https://i.pinimg.com/236x/a0/6f/d8/a06fd8e94e946bf832101ccf8a850d90.jpg' },
+            { title: 'Song 2', artist: 'Artist 2', src: 'song2.mp3', cover: 'https://www.naasongs.co/wp-content/uploads/2024/03/Premalu-2024-250x250.jpg' },
+            { title: 'Song 2', artist: 'Artist 2', src: 'song2.mp3', cover: 'https://i.pinimg.com/236x/dc/b7/68/dcb7688accda39e95123a1e27994e605.jpg' },
+            { title: 'Song 2', artist: 'Artist 2', src: 'song2.mp3', cover: 'https://a10.gaanacdn.com/gn_img/albums/P7m3GvNKqx/m3GvrMqRKq/size_m_1647147769.jpg' },
+        ];
+
+        const playlists = [
+            { name: 'Playlist 1', tracks: [library[0], library[1]] },
+
+            { name: 'Playlist 2', tracks: [library[2],library[3]] },
+            { name: 'Playlist 3', tracks: [library[4],library[5]] },
+        ];
+
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+        let isShuffle = false;
+        let isRepeat = false;
+
+        function loadPage(page) {
+            const mainContent = document.getElementById('main-content');
+            if (page === 'home') {
+                mainContent.innerHTML = `
+                    <h2>Welcome to the Music Player App</h2>
+                    <p>Select a song from the library or create a playlist to get started.</p>
+                `;
+            } else if (page === 'library') {
+                mainContent.innerHTML = `
+                    <div id="library">
+                        <h2>Available Tracks</h2>
+                        <ul id="track-list"></ul>
+                    </div>
+                `;
+                loadLibrary();
+            } else if (page === 'playlists') {
+                mainContent.innerHTML = `
+                    <div id="playlists">
+                        <h2>Your Playlists</h2>
+                        <ul id="playlist-list"></ul>
+                    </div>
+                `;
+                loadPlaylists();
+            }
+        }
+
+        function loadLibrary() {
+            const trackList = document.getElementById('track-list');
+            if (trackList) {
+                trackList.innerHTML = '';
+                library.forEach((track, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = <img src="${track.cover}" class="album-cover"> ${track.title} by ${track.artist};
+                    li.addEventListener('click', () => playTrack(index));
+                    trackList.appendChild(li);
+                });
+            }
+        }
+
+        function loadPlaylists() {
+            const playlistList = document.getElementById('playlist-list');
+            if (playlistList) {
+                playlistList.innerHTML = '';
+                playlists.forEach(playlist => {
+                    const li = document.createElement('li');
+                    li.textContent = playlist.name;
+                    li.addEventListener('click', () => viewPlaylist(playlist));
+                    playlistList.appendChild(li);
+                });
+            }
+        }
+
+        function playTrack(index) {
+            currentTrackIndex = index;
+            const track = library[currentTrackIndex];
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="audio-player">
+                    <img src="${track.cover}" class="album-cover">
+                    <h2>${track.title}</h2>
+                    <h3>${track.artist}</h3>
+                    <audio id="audio" src="${track.src}" controls></audio>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <div class="controls">
+                        <button onclick="prevTrack()">Prev</button>
+                        <button onclick="togglePlayPause()">${isPlaying ? 'Pause' : 'Play'}</button>
+                        <button onclick="nextTrack()">Next</button>
+                        <button onclick="toggleShuffle()">${isShuffle ? 'Shuffle On' : 'Shuffle Off'}</button>
+                        <button onclick="toggleRepeat()">${isRepeat ? 'Repeat On' : 'Repeat Off'}</button>
+                    </div>
+                </div>
+            `;
+
+            const audio = document.getElementById('audio');
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('ended', handleTrackEnd);
+            if (isPlaying) {
+                audio.play();
+            }
+        }
+
+        function updateProgress() {
+            const audio = document.getElementById('audio');
+            const progress = document.getElementById('progress');
+            const percentage = (audio.currentTime / audio.duration) * 100;
+            progress.style.width = ${percentage}%;
+        }
+
+        function handleTrackEnd() {
+            if (isRepeat) {
+                playTrack(currentTrackIndex);
+            } else if (isShuffle) {
+                playTrack(Math.floor(Math.random() * library.length));
+            } else {
+                nextTrack();
+            }
+        }
+
+        function togglePlayPause() {
+            const audio = document.getElementById('audio');
+            if (isPlaying) {
+                audio.pause();
+            } else {
+                audio.play();
+            }
+            isPlaying = !isPlaying;
+            loadPage('library');
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % library.length;
+            playTrack(currentTrackIndex);
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + library.length) % library.length;
+            playTrack(currentTrackIndex);
+        }
+
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            playTrack(currentTrackIndex);
+        }
+
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+            playTrack(currentTrackIndex);
+        }
+
+        function viewPlaylist(playlist) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div>
+                    <h2>${playlist.name}</h2>
+                    <ul id="playlist-track-list"></ul>
+                </div>
+            `;
+            const trackList = document.getElementById('playlist-track-list');
+            playlist.tracks.forEach(track => {
+                const li = document.createElement('li');
+                li.innerHTML = <img src="${track.cover}" class="album-cover"> ${track.title} by ${track.artist};
+                li.addEventListener('click', () => playTrack(library.indexOf(track)));
+                trackList.appendChild(li);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPage('home');
+        });
+    </script>
+</body>
+</html>
